@@ -1,6 +1,22 @@
 /* Vice City Cover Studio — editor chrome.
    Dark neon theme: deep violet panels, sunset pink/orange accents.
-   No web fonts yet; the display fonts land with the cover engine. */
+   Display fonts are Anton + Pacifico (SIL OFL 1.1), bundled in fonts/. */
+
+@font-face {
+  font-family: "Anton";
+  src: url("fonts/Anton-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Pacifico";
+  src: url("fonts/Pacifico-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
 
 * { box-sizing: border-box; }
 
@@ -20,8 +36,9 @@ body {
 
 .topbar h1 {
   margin: 0;
-  font-size: 30px;
-  letter-spacing: 2px;
+  font-family: "Anton", "Arial Black", sans-serif;
+  font-size: 34px;
+  letter-spacing: 3px;
   text-transform: uppercase;
 }
 
@@ -161,10 +178,34 @@ input[type="text"]:focus { outline: 2px solid #ffb347; outline-offset: 1px; }
   justify-content: center;
 }
 
+input[type="range"] {
+  width: 100%;
+  accent-color: #ffb347;
+}
+
+#reset-panel-btn {
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  background: transparent;
+  color: #ffb347;
+  border: 1px solid #5b3a8a;
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+#reset-panel-btn:hover { border-color: #ffb347; }
+
 .photo-strip img {
   width: 72px;
   height: 72px;
   object-fit: cover;
   border-radius: 8px;
   border: 2px solid #5b3a8a;
+  cursor: pointer;
+}
+
+.photo-strip img.selected {
+  border-color: #ffb347;
+  box-shadow: 0 0 0 2px #ff7a3d;
 }

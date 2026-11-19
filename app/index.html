@@ -58,12 +58,20 @@
       <input id="subtitle-input" type="text" value="My story, my streets" maxlength="80" autocomplete="off">
     </div>
 
+    <div class="control-group">
+      <span class="group-label" id="panel-label">Selected panel</span>
+      <p class="hint" id="panel-hint">Click a panel to select it. Drag its photo to move it, scroll to zoom, double-click to swap photos.</p>
+      <label class="field-label" for="zoom-slider">Zoom <span id="zoom-value">100%</span></label>
+      <input id="zoom-slider" type="range" min="100" max="300" value="100" step="5">
+      <button type="button" id="reset-panel-btn">Reset panel photo</button>
+    </div>
+
     <div class="control-group actions">
       <button type="button" id="shuffle-btn">Shuffle</button>
       <button type="button" id="export-btn">Export PNG</button>
     </div>
 
-    <p class="status" id="status" role="status">Skeleton ready — the cover engine lands in the next build step.</p>
+    <p class="status" id="status" role="status">Cover engine ready — load photos, pick a layout and grade, then export your PNG.</p>
   </section>
 
   <section class="preview" aria-label="Cover preview">

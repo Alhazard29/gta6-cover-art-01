@@ -1,29 +1,28 @@
-// Vice City Cover Studio — editor skeleton (chunk 1).
+// Vice City Cover Studio — editor wiring (chunk 2, written fresh).
 //
-// This module wires the editor chrome: photo loading, the layout / grade /
-// size pickers, the caption fields, and a placeholder preview on the canvas.
-// The real cover engine (multi-panel layout, per-panel crop/pan/zoom, colour
-// grades, PNG export) is a separate module, src/cover.js, and lands in the
-// next build step. Until then the preview draws a simple sunset placeholder
-// so the skeleton can be opened and checked in a browser as-is.
+// This module owns the editor state and the DOM: photo loading, the layout /
+// grade / size pickers, caption fields, per-panel interaction on the canvas
+// (click to select, drag to pan, scroll to zoom, double-click to swap the
+// photo), and the PNG export button. All drawing lives in src/cover.js.
+//
+// The app is fully offline: photos are read with object URLs and never
+// leave the machine; the only files it loads are its own, under app/.
 
-const LAYOUTS = ['vice-grid', 'four-panel', 'nine-grid', 'full-bleed', 'triple-strip'];
-const GRADES = ['vice-sunset', 'neon-nights', 'palm-dusk', 'noir', 'candy-pop'];
-const SIZES = {
-  '1080x1080': [1080, 1080],
-  '1080x1350': [1080, 1350],
-  '1920x1080': [1920, 1080],
-};
+import {
+  SIZES,
+  LAYOUTS,
+  GRADES,
+  renderCover,
+  exportCoverPNG,
+  panelAt,
+  clampPan,
+  defaultPanelState,
+} from './cover.js';
 
-// Placeholder grade palettes (top, middle, bottom) used only by the
-// skeleton preview; the engine re-uses these names with full grading.
-const GRADE_COLORS = {
-  'vice-sunset': ['#ff9a3d', '#ff4d6d', '#7a1e6e'],
-  'neon-nights': ['#00e5ff', '#7b2ff7', '#ff2e88'],
-  'palm-dusk': ['#ffd166', '#ef476f', '#2a1a5e'],
-  'noir': ['#3a3a3a', '#1c1c1c', '#000000'],
-  'candy-pop': ['#ff6b9d', '#c084fc', '#38bdf8'],
-};
+const LAYOUT_KEYS = Object.keys(LAYOUTS);
+const GRADE_KEYS = Object.keys(GRADES);
+const SIZE_KEYS = Object.keys(SIZES);
+const MAX_PANELS = 9;
 
 const state = {
   layout: 'vice-grid',
@@ -32,6 +31,9 @@ const state = {
   title: 'VICE CITY',
   subtitle: 'My story, my streets',
   photos: [], // { name, url, image }
+  panels: Array.from({ length: MAX_PANELS }, () => defaultPanelState()),
+  selectedPanel: 0,
+  showSelection: true,
 };
 
 const canvas = document.getElementById('cover-canvas');
@@ -40,50 +42,86 @@ const statusEl = document.getElementById('status');
 const photoCountEl = document.getElementById('photo-count');
 const photoStripEl = document.getElementById('photo-strip');
 const exportBtn = document.getElementById('export-btn');
+const zoomSlider = document.getElementById('zoom-slider');
+const zoomValueEl = document.getElementById('zoom-value');
+const resetPanelBtn = document.getElementById('reset-panel-btn');
+
+// Display fonts are bundled under app/fonts/ (Anton + Pacifico, SIL OFL).
+// The cover is only drawn once they are ready, so the lettering is the
+// real thing in both the preview and the export.
+const fontsReady = Promise.all([
+  document.fonts.load('32px Anton'),
+  document.fonts.load('32px Pacifico'),
+]).catch(() => {
+  // If a font file is missing the canvas falls back to system fonts;
+  // the app still works, just with plainer lettering.
+});
 
 function setStatus(text) {
   statusEl.textContent = text;
 }
 
-// Draw the skeleton placeholder: a vertical grade gradient, the title in
-// big letters and the subtitle underneath. No photos, no panels yet.
-function drawPlaceholder() {
+function panelCount() {
+  return LAYOUTS[state.layout].panels.length;
+}
+
+// Give every visible panel a photo, in order, when it has none yet.
+function assignPhotos() {
+  if (state.photos.length === 0) return;
+  for (let i = 0; i < panelCount(); i++) {
+    if (state.panels[i].photo < 0 || state.panels[i].photo >= state.photos.length) {
+      state.panels[i].photo = i % state.photos.length;
+      state.panels[i].zoom = 1;
+      state.panels[i].dx = 0;
+      state.panels[i].dy = 0;
+    }
+  }
+}
+
+function draw() {
   const [width, height] = SIZES[state.size];
   canvas.width = width;
   canvas.height = height;
-  const [top, mid, bottom] = GRADE_COLORS[state.grade];
-  const gradient = ctx.createLinearGradient(0, 0, 0, height);
-  gradient.addColorStop(0, top);
-  gradient.addColorStop(0.55, mid);
-  gradient.addColorStop(1, bottom);
-  ctx.fillStyle = gradient;
-  ctx.fillRect(0, 0, width, height);
+  renderCover(ctx, width, height, state);
+  syncPanelControls();
+}
 
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-  ctx.textAlign = 'center';
-  ctx.font = `900 ${Math.round(width * 0.09)}px "Arial Black", Arial, sans-serif`;
-  ctx.fillText(state.title.toUpperCase(), width / 2, height * 0.52);
-  ctx.font = `italic ${Math.round(width * 0.032)}px Georgia, serif`;
-  ctx.fillText(state.subtitle, width / 2, height * 0.58);
+function drawWhenReady() {
+  fontsReady.then(draw);
+}
 
-  ctx.font = `${Math.round(width * 0.02)}px Arial, sans-serif`;
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
-  ctx.fillText('Skeleton preview — cover engine coming next', width / 2, height * 0.94);
+function syncPanelControls() {
+  const transform = state.panels[state.selectedPanel] || defaultPanelState();
+  zoomSlider.value = String(Math.round(transform.zoom * 100));
+  zoomValueEl.textContent = `${Math.round(transform.zoom * 100)}%`;
+  for (const thumb of photoStripEl.querySelectorAll('img')) {
+    thumb.classList.toggle('selected', Number(thumb.dataset.photoIndex) === transform.photo);
+  }
 }
 
 function refreshPhotoStrip() {
   photoStripEl.replaceChildren();
-  for (const photo of state.photos) {
+  state.photos.forEach((photo, index) => {
     const thumb = document.createElement('img');
     thumb.src = photo.url;
     thumb.alt = photo.name;
-    thumb.title = photo.name;
+    thumb.title = `${photo.name} — click to put it in the selected panel`;
+    thumb.dataset.photoIndex = String(index);
+    thumb.addEventListener('click', () => {
+      const transform = state.panels[state.selectedPanel];
+      transform.photo = index;
+      transform.zoom = 1;
+      transform.dx = 0;
+      transform.dy = 0;
+      draw();
+      setStatus(`Panel ${state.selectedPanel + 1} now shows ${photo.name}. Drag it to position, scroll to zoom.`);
+    });
     photoStripEl.appendChild(thumb);
-  }
+  });
   photoCountEl.textContent =
     state.photos.length === 0
       ? 'No photos loaded yet.'
-      : `${state.photos.length} photo${state.photos.length > 1 ? 's' : ''} loaded.`;
+      : `${state.photos.length} photo${state.photos.length > 1 ? 's' : ''} loaded — click a thumbnail, then a panel.`;
 }
 
 function loadPhotos(fileList) {
@@ -92,16 +130,25 @@ function loadPhotos(fileList) {
     setStatus('That file is not an image — pick a photo to load.');
     return;
   }
+  let pending = files.length;
   for (const file of files) {
     const url = URL.createObjectURL(file);
     const image = new Image();
     image.onload = () => {
       state.photos.push({ name: file.name, url, image });
-      refreshPhotoStrip();
-      setStatus(`${state.photos.length} photo${state.photos.length > 1 ? 's' : ''} loaded. Cover engine lands next — panels and export after that.`);
+      pending -= 1;
+      if (pending === 0) {
+        assignPhotos();
+        refreshPhotoStrip();
+        draw();
+        setStatus(
+          `${state.photos.length} photo${state.photos.length > 1 ? 's' : ''} loaded across ${panelCount()} panel${panelCount() > 1 ? 's' : ''}. Click a panel to select it, drag to move its photo.`,
+        );
+      }
     };
     image.onerror = () => {
       URL.revokeObjectURL(url);
+      pending -= 1;
       setStatus(`Could not read ${file.name} — try another photo.`);
     };
     image.src = url;
@@ -119,10 +166,108 @@ function wirePicker(pickerId, key, values) {
     for (const btn of picker.querySelectorAll('button')) {
       btn.classList.toggle('active', btn === button);
     }
-    drawPlaceholder();
+    if (key === 'layout') {
+      state.selectedPanel = 0;
+      assignPhotos();
+    }
+    draw();
     setStatus(`${key} set to ${button.textContent.trim()}.`);
   });
 }
+
+function canvasPoint(event) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return {
+    x: (event.clientX - rect.left) * scaleX,
+    y: (event.clientY - rect.top) * scaleY,
+    rect,
+    scaleX,
+    scaleY,
+  };
+}
+
+function clampSelectedPan() {
+  const layout = LAYOUTS[state.layout];
+  const panel = layout.panels[state.selectedPanel];
+  const transform = state.panels[state.selectedPanel];
+  const photo = state.photos[transform.photo];
+  if (panel && photo) clampPan(panel, photo.image, transform);
+}
+
+// --- canvas interaction: select / pan / zoom / swap ---
+
+let drag = null; // { panel, lastX, lastY }
+
+canvas.addEventListener('pointerdown', (event) => {
+  const { x, y } = canvasPoint(event);
+  const panel = panelAt(state, x, y, canvas.width, canvas.height);
+  if (panel < 0) return;
+  state.selectedPanel = panel;
+  drag = { panel, lastX: x, lastY: y, moved: false };
+  canvas.setPointerCapture(event.pointerId);
+  draw();
+});
+
+canvas.addEventListener('pointermove', (event) => {
+  if (!drag) return;
+  const { x, y, rect, scaleX } = canvasPoint(event);
+  const layout = LAYOUTS[state.layout];
+  const panel = layout.panels[drag.panel];
+  const transform = state.panels[drag.panel];
+  const photo = state.photos[transform.photo];
+  if (!panel || !photo) {
+    drag = null;
+    return;
+  }
+  const dxPixels = x - drag.lastX;
+  const dyPixels = y - drag.lastY;
+  if (Math.abs(dxPixels) + Math.abs(dyPixels) > 0.5) drag.moved = true;
+  transform.dx += dxPixels / (panel.w * canvas.width);
+  transform.dy += dyPixels / (panel.h * canvas.height);
+  clampPan(panel, photo.image, transform);
+  drag.lastX = x;
+  drag.lastY = y;
+  void rect;
+  void scaleX;
+  draw();
+});
+
+canvas.addEventListener('pointerup', () => {
+  drag = null;
+});
+
+canvas.addEventListener('wheel', (event) => {
+  event.preventDefault();
+  const { x, y } = canvasPoint(event);
+  const panel = panelAt(state, x, y, canvas.width, canvas.height);
+  if (panel >= 0) state.selectedPanel = panel;
+  const transform = state.panels[state.selectedPanel];
+  const layout = LAYOUTS[state.layout];
+  const photo = state.photos[transform.photo];
+  if (!photo) return;
+  const factor = event.deltaY < 0 ? 1.12 : 1 / 1.12;
+  transform.zoom = Math.max(1, Math.min(3, transform.zoom * factor));
+  clampPan(layout.panels[state.selectedPanel], photo.image, transform);
+  draw();
+}, { passive: false });
+
+canvas.addEventListener('dblclick', (event) => {
+  const { x, y } = canvasPoint(event);
+  const panel = panelAt(state, x, y, canvas.width, canvas.height);
+  if (panel < 0 || state.photos.length < 2) return;
+  const transform = state.panels[panel];
+  transform.photo = (transform.photo + 1) % state.photos.length;
+  transform.zoom = 1;
+  transform.dx = 0;
+  transform.dy = 0;
+  state.selectedPanel = panel;
+  draw();
+  setStatus(`Panel ${panel + 1} now shows ${state.photos[transform.photo].name}.`);
+});
+
+// --- controls ---
 
 document.getElementById('photo-input').addEventListener('change', (event) => {
   loadPhotos(event.target.files);
@@ -131,35 +276,85 @@ document.getElementById('photo-input').addEventListener('change', (event) => {
 
 document.getElementById('title-input').addEventListener('input', (event) => {
   state.title = event.target.value;
-  drawPlaceholder();
+  draw();
 });
 
 document.getElementById('subtitle-input').addEventListener('input', (event) => {
   state.subtitle = event.target.value;
-  drawPlaceholder();
+  draw();
+});
+
+zoomSlider.addEventListener('input', () => {
+  const transform = state.panels[state.selectedPanel];
+  const photo = state.photos[transform.photo];
+  transform.zoom = Number(zoomSlider.value) / 100;
+  if (photo) clampSelectedPan();
+  draw();
+});
+
+resetPanelBtn.addEventListener('click', () => {
+  const transform = state.panels[state.selectedPanel];
+  const photoIndex = transform.photo;
+  state.panels[state.selectedPanel] = { ...defaultPanelState(), photo: photoIndex };
+  draw();
+  setStatus(`Panel ${state.selectedPanel + 1} reset to cover-fit.`);
 });
 
 document.getElementById('shuffle-btn').addEventListener('click', () => {
-  const layouts = LAYOUTS.filter((layout) => layout !== state.layout);
-  const grades = GRADES.filter((grade) => grade !== state.grade);
+  const layouts = LAYOUT_KEYS.filter((layout) => layout !== state.layout);
+  const grades = GRADE_KEYS.filter((grade) => grade !== state.grade);
   state.layout = layouts[Math.floor(Math.random() * layouts.length)];
   state.grade = grades[Math.floor(Math.random() * grades.length)];
+  // Shuffle which photo sits in each panel, too.
+  if (state.photos.length > 0) {
+    for (let i = 0; i < panelCount(); i++) {
+      state.panels[i].photo = Math.floor(Math.random() * state.photos.length);
+      state.panels[i].zoom = 1;
+      state.panels[i].dx = 0;
+      state.panels[i].dy = 0;
+    }
+  }
+  state.selectedPanel = 0;
   document.querySelectorAll('#layout-picker button').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.layout === state.layout);
   });
   document.querySelectorAll('#grade-picker button').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.grade === state.grade);
   });
-  drawPlaceholder();
-  setStatus(`Shuffled to ${state.layout} / ${state.grade}.`);
+  draw();
+  setStatus(`Shuffled to ${LAYOUTS[state.layout].label} / ${GRADES[state.grade].label}.`);
 });
 
-exportBtn.addEventListener('click', () => {
-  setStatus('Export is not wired yet — the cover engine (chunk 2) adds PNG export in 1080×1080, 1080×1350 and 1920×1080.');
+exportBtn.addEventListener('click', async () => {
+  exportBtn.disabled = true;
+  setStatus(`Exporting ${state.size} PNG…`);
+  try {
+    await fontsReady;
+    const blob = await exportCoverPNG(state, state.size);
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `vice-city-cover-${state.size}.png`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 5000);
+    const kb = Math.round(blob.size / 1024);
+    setStatus(`Exported vice-city-cover-${state.size}.png (${blob.size.toLocaleString()} bytes, ${kb} KB). Saved to your downloads.`);
+  } catch (error) {
+    setStatus(`Export failed: ${error.message} — try again.`);
+  } finally {
+    exportBtn.disabled = false;
+  }
 });
 
-wirePicker('layout-picker', 'layout', LAYOUTS);
-wirePicker('grade-picker', 'grade', GRADES);
-wirePicker('size-picker', 'size', Object.keys(SIZES));
+wirePicker('layout-picker', 'layout', LAYOUT_KEYS);
+wirePicker('grade-picker', 'grade', GRADE_KEYS);
+wirePicker('size-picker', 'size', SIZE_KEYS);
 
-drawPlaceholder();
+drawWhenReady();
+
+// Small test hook for the headless verification runs (chunk 2/3): lets a
+// script load photos and trigger an export without a real file picker.
+// It exposes no network access and changes nothing about the app itself.
+window.__coverStudio = { state, draw, loadPhotos, exportCoverPNG };
