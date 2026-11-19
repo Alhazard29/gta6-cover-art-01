@@ -1,250 +1,197 @@
-@font-face {
-  font-family: "Anton";
-  src: url("./fonts/Anton-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
+/* Vice Cover Studio — system fonts only. No font files are shipped and no
+   external resources are loaded; every face below resolves from the
+   operating system's own font library. */
+
+:root {
+  /* Heavy condensed display stack for poster titles: the boldest sans the
+     system has, tight and uppercase, in the Vice City poster spirit. */
+  --font-display: "Arial Black", "Impact", "Helvetica Neue", Arial, sans-serif;
+  /* Elegant serif italic stack for subtitles and taglines. */
+  --font-script: Georgia, "Times New Roman", "Nimbus Roman", serif;
+  /* Plain UI stack for controls and body copy. */
+  --font-ui: "Helvetica Neue", Arial, "Segoe UI", sans-serif;
+
+  --ink: #fff7ec;
+  --ink-dim: #ffd9a8;
+  --panel: #1a0b2e;
+  --panel-2: #241040;
+  --line: #ff2e88;
+  --accent: #ff9a3d;
+  --accent-2: #2de2ff;
+  --bg: #12041f;
 }
 
-@font-face {
-  font-family: "Pacifico";
-  src: url("./fonts/Pacifico-Regular.ttf") format("truetype");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
+* { box-sizing: border-box; }
 
-* {
-  box-sizing: border-box;
-}
+html, body { margin: 0; padding: 0; }
 
 body {
-  margin: 0;
+  font-family: var(--font-ui);
+  color: var(--ink);
+  background:
+    radial-gradient(1200px 500px at 50% -10%, #ff2e88 0%, transparent 60%),
+    radial-gradient(900px 420px at 85% 110%, #2de2ff 0%, transparent 55%),
+    linear-gradient(180deg, #2b0a4a 0%, var(--bg) 55%, #0a0212 100%);
   min-height: 100vh;
-  background: #0f2027;
-  color: #f4f1ea;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-header {
-  padding: 24px 24px 8px;
+.topbar {
+  padding: 28px 24px 8px;
   text-align: center;
 }
 
-header h1 {
-  margin: 0;
-  font-family: "Anton", "Arial Narrow", sans-serif;
-  font-size: 44px;
-  letter-spacing: 2px;
+/* Poster title treatment: heavy system sans, gradient fill, hard shadow,
+   tight tracking — the Vice City look without any font file. */
+.app-title {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(34px, 6vw, 64px);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
   text-transform: uppercase;
-  color: #ff6b5e;
-  text-shadow: 3px 3px 0 #2ec4b6;
+  margin: 0;
+  background: linear-gradient(180deg, #fff7ec 15%, #ffb347 45%, #ff2e88 80%, #7b2fff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.35), 0 10px 28px rgba(255, 46, 136, 0.45);
 }
 
-.tagline {
-  margin: 6px 0 0;
-  color: #9fb3bd;
-  font-size: 15px;
+.app-title span { letter-spacing: 0.04em; }
+
+.app-tagline {
+  font-family: var(--font-script);
+  font-style: italic;
+  font-size: 18px;
+  color: var(--ink-dim);
+  margin: 10px 0 0;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
 }
 
-main {
-  display: flex;
-  flex-wrap: wrap;
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 300px;
   gap: 24px;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 16px 24px 32px;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 24px 40px;
+}
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+}
+
+.editor {
+  background: var(--panel);
+  border: 1px solid rgba(255, 46, 136, 0.45);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
 }
 
 .controls {
-  width: 320px;
-  max-width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  padding: 20px;
-  background: #162e38;
-  border: 1px solid #24424f;
-  border-radius: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-bottom: 18px;
 }
 
 .field {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
 }
 
 .field input[type="text"],
 .field select,
 .field input[type="file"] {
-  width: 100%;
-  padding: 9px 10px;
-  border: 1px solid #24424f;
-  border-radius: 8px;
-  background: #0f2027;
-  color: #f4f1ea;
-  font-size: 14px;
-  font-family: inherit;
-}
-
-.picker {
-  margin: 0;
-  padding: 12px;
-  border: 1px solid #24424f;
-  border-radius: 8px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.picker legend {
-  font-size: 14px;
-  font-weight: 600;
-  padding: 0 6px;
-}
-
-.picker button,
-.actions button {
-  padding: 8px 12px;
-  border: 1px solid #2ec4b6;
-  border-radius: 999px;
-  background: transparent;
-  color: #f4f1ea;
-  font-size: 13px;
-  font-family: inherit;
-  cursor: pointer;
-}
-
-.picker button:hover,
-.actions button:hover {
-  background: #1d3a46;
-}
-
-.picker button.active {
-  background: #ff6b5e;
-  border-color: #ff6b5e;
-  color: #0f2027;
-  font-weight: 700;
-}
-
-.actions {
-  display: flex;
-  gap: 10px;
-}
-
-.actions button {
-  flex: 1;
-  padding: 11px 12px;
+  font-family: var(--font-ui);
   font-size: 15px;
+  color: var(--ink);
+  background: var(--panel-2);
+  border: 1px solid rgba(255, 154, 61, 0.5);
+  border-radius: 8px;
+  padding: 9px 10px;
 }
 
-.actions button.primary {
-  background: #2ec4b6;
-  border-color: #2ec4b6;
-  color: #0f2027;
-  font-weight: 700;
+.field input[type="text"]:focus,
+.field select:focus {
+  outline: 2px solid var(--accent-2);
+  outline-offset: 1px;
 }
 
-.actions button.primary:hover {
-  background: #35d6c7;
+#exportBtn {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 16px;
+  color: #1a0b2e;
+  background: linear-gradient(180deg, #ffd166, #ff9a3d 55%, #ff2e88);
+  border: none;
+  border-radius: 8px;
+  padding: 12px 18px;
+  cursor: pointer;
+  align-self: end;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.4), 0 8px 22px rgba(255, 46, 136, 0.4);
 }
 
-.preview {
-  flex: 1 1 640px;
-  min-width: 320px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  max-width: 100%;
-}
+#exportBtn:hover { filter: brightness(1.08); }
+#exportBtn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0, 0, 0, 0.4); }
+
+.preview-wrap { text-align: center; }
 
 #coverCanvas {
-  display: block;
   width: 100%;
-  max-width: min(100%, 640px);
+  max-width: 640px;
   height: auto;
-  border: 2px solid #2ec4b6;
-  border-radius: 8px;
-  background: #162e38;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
-}
-
-.hint {
-  margin: 0;
-  color: #9fb3bd;
-  font-size: 13px;
-  text-align: center;
-}
-
-.panel-controls {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid #24424f;
-  border-radius: 8px;
-}
-
-.panel-hint {
-  margin: 0;
-  color: #9fb3bd;
-  font-size: 13px;
-  line-height: 1.5;
-}
-
-.slider-field output {
-  color: #2ec4b6;
-  font-weight: 700;
-}
-
-input[type="range"] {
-  width: 100%;
-  accent-color: #2ec4b6;
-  cursor: pointer;
-}
-
-#resetPanelBtn {
-  padding: 8px 12px;
-  border: 1px solid #2ec4b6;
-  border-radius: 999px;
-  background: transparent;
-  color: #f4f1ea;
-  font-size: 13px;
-  font-family: inherit;
-  cursor: pointer;
-}
-
-#resetPanelBtn:hover {
-  background: #1d3a46;
-}
-
-.thumbs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-}
-
-.thumb {
-  padding: 0;
-  border: 2px solid transparent;
-  border-radius: 8px;
-  background: none;
-  cursor: pointer;
-  overflow: hidden;
-}
-
-.thumb img {
+  border-radius: 12px;
+  border: 1px solid rgba(45, 226, 255, 0.4);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.6);
+  background: #2b0a4a;
   display: block;
-  width: 72px;
-  height: 72px;
-  object-fit: cover;
+  margin: 0 auto;
 }
 
-.thumb.selected {
-  border-color: #ff6b5e;
-  box-shadow: 0 0 0 2px #ff6b5e;
+.preview-note {
+  font-family: var(--font-script);
+  font-style: italic;
+  color: var(--ink-dim);
+  font-size: 14px;
+  margin: 12px 0 0;
+}
+
+.help {
+  background: rgba(26, 11, 46, 0.85);
+  border: 1px solid rgba(45, 226, 255, 0.35);
+  border-radius: 16px;
+  padding: 20px;
+  height: fit-content;
+}
+
+.help h2 {
+  font-family: var(--font-display);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-size: 20px;
+  margin: 0 0 12px;
+  color: var(--accent);
+  text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
+}
+
+.help ol { margin: 0; padding-left: 20px; line-height: 1.6; }
+.help li { margin-bottom: 8px; }
+
+.fineprint {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ink-dim);
+  border-top: 1px solid rgba(255, 154, 61, 0.35);
+  padding-top: 12px;
+  margin: 16px 0 0;
 }
