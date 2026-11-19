@@ -175,3 +175,73 @@ main {
   font-size: 13px;
   text-align: center;
 }
+
+.panel-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid #24424f;
+  border-radius: 8px;
+}
+
+.panel-hint {
+  margin: 0;
+  color: #9fb3bd;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.slider-field output {
+  color: #2ec4b6;
+  font-weight: 700;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: #2ec4b6;
+  cursor: pointer;
+}
+
+#resetPanelBtn {
+  padding: 8px 12px;
+  border: 1px solid #2ec4b6;
+  border-radius: 999px;
+  background: transparent;
+  color: #f4f1ea;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+#resetPanelBtn:hover {
+  background: #1d3a46;
+}
+
+.thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.thumb {
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.thumb img {
+  display: block;
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+}
+
+.thumb.selected {
+  border-color: #ff6b5e;
+  box-shadow: 0 0 0 2px #ff6b5e;
+}
