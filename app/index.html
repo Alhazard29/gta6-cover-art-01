@@ -3,83 +3,79 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vice City Cover Studio — GTA 6-style cover art maker</title>
+<title>Vice City Cover Studio — photo to GTA 6 poster, offline</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="topbar">
   <h1>Vice City Cover Studio</h1>
-  <p class="tagline">Turn your photo and a caption into GTA 6-style cover art. Offline, on your machine — your photos never leave it.</p>
+  <p class="tagline">Turn your photo into a GTA 6-style Vice City poster. Offline — your photos never leave this machine.</p>
 </header>
 
-<main class="studio">
+<main class="layout">
   <section class="controls" aria-label="Cover controls">
-    <div class="control-group">
-      <label class="upload-label" for="photo-input">Add photos</label>
-      <input id="photo-input" type="file" accept="image/*" multiple>
-      <p class="hint" id="photo-count">No photos loaded yet.</p>
+    <div class="group">
+      <label class="upload" for="photo-input">Add photos</label>
+      <input id="photo-input" type="file" accept="image/*" multiple hidden>
+      <span id="photo-count" class="hint">No photos yet — add one or more.</span>
     </div>
 
-    <div class="control-group">
-      <span class="group-label" id="layout-label">Layout</span>
-      <div class="picker" role="group" aria-labelledby="layout-label" id="layout-picker">
-        <button type="button" data-layout="vice-grid" class="picker-btn active">Vice Grid</button>
-        <button type="button" data-layout="four-panel" class="picker-btn">Four Panel</button>
-        <button type="button" data-layout="nine-grid" class="picker-btn">Nine Grid</button>
-        <button type="button" data-layout="full-bleed" class="picker-btn">Full Bleed</button>
-        <button type="button" data-layout="triple-strip" class="picker-btn">Triple Strip</button>
+    <div class="group">
+      <h2>Layout</h2>
+      <div class="picker" id="layout-picker" role="group" aria-label="Layout">
+        <button type="button" data-layout="vice-grid" class="active">Vice Grid</button>
+        <button type="button" data-layout="four-panel">Four Panel</button>
+        <button type="button" data-layout="nine-grid">Nine Grid</button>
+        <button type="button" data-layout="full-bleed">Full Bleed</button>
+        <button type="button" data-layout="triple-strip">Triple Strip</button>
       </div>
     </div>
 
-    <div class="control-group">
-      <span class="group-label" id="grade-label">Colour grade</span>
-      <div class="picker" role="group" aria-labelledby="grade-label" id="grade-picker">
-        <button type="button" data-grade="vice-sunset" class="picker-btn active">Vice Sunset</button>
-        <button type="button" data-grade="neon-nights" class="picker-btn">Neon Nights</button>
-        <button type="button" data-grade="palm-dusk" class="picker-btn">Palm Dusk</button>
-        <button type="button" data-grade="noir" class="picker-btn">Noir</button>
-        <button type="button" data-grade="candy-pop" class="picker-btn">Candy Pop</button>
+    <div class="group">
+      <h2>Grade</h2>
+      <div class="picker" id="grade-picker" role="group" aria-label="Grade">
+        <button type="button" data-grade="sunset" class="active">Vice Sunset</button>
+        <button type="button" data-grade="neon">Neon Nights</button>
+        <button type="button" data-grade="dusk">Palm Dusk</button>
+        <button type="button" data-grade="noir">Noir</button>
+        <button type="button" data-grade="candy">Candy Pop</button>
       </div>
     </div>
 
-    <div class="control-group">
-      <span class="group-label" id="size-label">Export size</span>
-      <div class="picker" role="group" aria-labelledby="size-label" id="size-picker">
-        <button type="button" data-size="1080x1080" class="picker-btn active">1080 × 1080</button>
-        <button type="button" data-size="1080x1350" class="picker-btn">1080 × 1350</button>
-        <button type="button" data-size="1920x1080" class="picker-btn">1920 × 1080</button>
+    <div class="group">
+      <h2>Caption</h2>
+      <label class="field">Title
+        <input id="title-input" type="text" value="VICE CITY" maxlength="40" autocomplete="off">
+      </label>
+      <label class="field">Subtitle
+        <input id="subtitle-input" type="text" value="Welcome to Leonida" maxlength="60" autocomplete="off">
+      </label>
+    </div>
+
+    <div class="group">
+      <h2>Export</h2>
+      <label class="field">Size
+        <select id="size-select">
+          <option value="1080x1080">1080 × 1080 (square)</option>
+          <option value="1080x1350">1080 × 1350 (portrait)</option>
+          <option value="1920x1080">1920 × 1080 (wide)</option>
+        </select>
+      </label>
+      <div class="actions">
+        <button type="button" id="shuffle-btn">Shuffle</button>
+        <button type="button" id="export-btn" class="primary">Export PNG</button>
       </div>
     </div>
 
-    <div class="control-group">
-      <label class="field-label" for="title-input">Title</label>
-      <input id="title-input" type="text" value="VICE CITY" maxlength="40" autocomplete="off">
-      <label class="field-label" for="subtitle-input">Subtitle</label>
-      <input id="subtitle-input" type="text" value="My story, my streets" maxlength="80" autocomplete="off">
-    </div>
-
-    <div class="control-group">
-      <span class="group-label" id="panel-label">Selected panel</span>
-      <p class="hint" id="panel-hint">Click a panel to select it. Drag its photo to move it, scroll to zoom, double-click to swap photos.</p>
-      <label class="field-label" for="zoom-slider">Zoom <span id="zoom-value">100%</span></label>
-      <input id="zoom-slider" type="range" min="100" max="300" value="100" step="5">
-      <button type="button" id="reset-panel-btn">Reset panel photo</button>
-    </div>
-
-    <div class="control-group actions">
-      <button type="button" id="shuffle-btn">Shuffle</button>
-      <button type="button" id="export-btn">Export PNG</button>
-    </div>
-
-    <p class="status" id="status" role="status">Cover engine ready — load photos, pick a layout and grade, then export your PNG.</p>
+    <p id="status" class="status" role="status">Ready — add a photo to begin.</p>
   </section>
 
   <section class="preview" aria-label="Cover preview">
     <canvas id="cover-canvas" width="1080" height="1080"></canvas>
-    <div class="photo-strip" id="photo-strip" aria-label="Loaded photos"></div>
+    <p class="hint">Preview — the cover engine renders here. Export downloads a PNG.</p>
   </section>
 </main>
 
-<script type="module" src="src/main.js"></script>
+<script src="src/main.js"></script>
 </body>
 </html>
