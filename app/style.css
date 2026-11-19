@@ -1,0 +1,229 @@
+/* Vice City Cover Studio — dark editor UI, neon accents. All fonts are
+   local files under fonts/ (SIL Open Font License); nothing loads from
+   the network. */
+
+@font-face {
+  font-family: 'Anton';
+  src: url('fonts/Anton-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pacifico';
+  src: url('fonts/Pacifico-Regular.ttf') format('truetype');
+  font-display: swap;
+}
+
+:root {
+  --bg: #0b0618;
+  --panel: #17102b;
+  --panel-2: #1e1538;
+  --line: #332452;
+  --text: #f4efff;
+  --muted: #b9aed6;
+  --sun: #ffa751;
+  --pink: #ff2e88;
+  --cyan: #7df9ff;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(90deg, #1a0b2e, #2b0a33 55%, #160a2e);
+}
+header h1 {
+  margin: 0;
+  font-family: Anton, 'Arial Black', sans-serif;
+  font-size: 26px;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #ffe259, #ffa751 45%, #ff2e88);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+header p { margin: 0; color: var(--muted); font-size: 13px; }
+
+main {
+  display: grid;
+  grid-template-columns: minmax(420px, 1fr) 340px;
+  gap: 18px;
+  padding: 18px 22px 30px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+
+.stage { min-width: 0; }
+#preview {
+  display: block;
+  max-width: 100%;
+  max-height: 640px;
+  width: auto;
+  height: auto;
+  margin: 0 auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #000;
+  cursor: grab;
+  touch-action: none;
+}
+#preview:active { cursor: grabbing; }
+.stage p.hint {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 10px 2px;
+}
+#photoCount { color: var(--cyan); font-weight: 600; }
+
+#dropZone {
+  margin-top: 12px;
+  padding: 16px;
+  border: 1px dashed var(--line);
+  border-radius: 10px;
+  text-align: center;
+  color: var(--muted);
+  cursor: pointer;
+  background: var(--panel);
+}
+#dropZone:hover { border-color: var(--pink); color: var(--text); }
+#dropZone strong { color: var(--sun); }
+
+#photoList {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.thumb {
+  width: 150px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 12px;
+}
+.thumb img { display: block; width: 100%; height: 92px; object-fit: cover; }
+.thumb span { display: block; padding: 6px 8px 2px; color: var(--muted); }
+.thumb button {
+  display: block;
+  width: calc(100% - 12px);
+  margin: 4px 6px 8px;
+  padding: 5px 0;
+  font-size: 12px;
+  background: var(--panel-2);
+  color: var(--cyan);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+aside.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  height: fit-content;
+}
+aside.controls h2 {
+  margin: 0 0 8px;
+  font-family: Anton, 'Arial Black', sans-serif;
+  font-size: 15px;
+  letter-spacing: 2px;
+  color: var(--sun);
+}
+aside.controls label {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin: 10px 0 4px;
+}
+aside.controls input[type="text"],
+aside.controls select {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+}
+aside.controls input[type="text"]:focus,
+aside.controls select:focus {
+  outline: 2px solid var(--pink);
+  outline-offset: 1px;
+}
+aside.controls input[type="range"] { width: 100%; accent-color: var(--pink); }
+
+.picker { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.picker .pick {
+  text-align: left;
+  padding: 8px 10px;
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.picker .pick strong { display: block; font-size: 13px; }
+.picker .pick span { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+.picker .pick:hover { border-color: var(--cyan); }
+.picker .pick.active { border-color: var(--pink); box-shadow: 0 0 0 1px var(--pink); }
+.picker .grade i {
+  display: block;
+  height: 26px;
+  border-radius: 5px;
+  margin-bottom: 6px;
+}
+
+.row { display: flex; gap: 8px; align-items: center; }
+.row output { font-size: 13px; color: var(--cyan); min-width: 44px; text-align: right; }
+#panelLabel { font-size: 13px; font-weight: 700; color: var(--sun); }
+
+button.primary {
+  padding: 12px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #1a0510;
+  background: linear-gradient(90deg, #ffe259, #ffa751 45%, #ff2e88);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+button.primary:disabled { opacity: 0.6; cursor: wait; }
+button.ghost {
+  padding: 10px;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+#exportNote { font-size: 12px; color: var(--muted); min-height: 16px; }
+
+#selftest {
+  white-space: pre-wrap;
+  font-family: monospace;
+  font-size: 12px;
+  color: var(--cyan);
+}
+
+/* Shot mode: only the cover canvas shows, full window. */
+body.shot { background: #000; }
+body.shot header,
+body.shot main { display: none; }
+body.shot #shotCanvas { display: block; }
+#shotCanvas { display: none; }

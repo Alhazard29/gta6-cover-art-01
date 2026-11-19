@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vice City Cover Studio — photo to poster, offline</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>VICE CITY COVER STUDIO</h1>
+  <p>Your photo + caption &rarr; a multi-panel poster. Fully offline — photos never leave this machine.</p>
+</header>
+<main>
+  <section class="stage">
+    <canvas id="preview" width="860" height="860" aria-label="Live cover preview"></canvas>
+    <p class="hint">Click a panel to select it, drag it to reposition the photo, scroll over it to zoom. <span id="photoCount"></span></p>
+    <div id="dropZone" role="button" tabindex="0">
+      <strong>+ Add your photos</strong> — click to choose files, or drop them here. JPG / PNG / WebP.
+      <input id="fileInput" type="file" accept="image/*" multiple hidden>
+    </div>
+    <div id="photoList"></div>
+    <pre id="selftest"></pre>
+  </section>
+  <aside class="controls">
+    <section>
+      <h2>1 · Layout</h2>
+      <div class="picker" id="layoutPicker"></div>
+    </section>
+    <section>
+      <h2>2 · Grade</h2>
+      <div class="picker" id="gradePicker"></div>
+    </section>
+    <section>
+      <h2>3 · Caption</h2>
+      <label for="titleInput">Title (big letters)</label>
+      <input id="titleInput" type="text" maxlength="24" value="NEON SHORE">
+      <label for="subtitleInput">Subtitle (script)</label>
+      <input id="subtitleInput" type="text" maxlength="40" value="sunset drive">
+      <label for="badgeInput">Badge ribbon</label>
+      <input id="badgeInput" type="text" maxlength="24" value="VICE CITY · 2026">
+    </section>
+    <section>
+      <h2>4 · Selected panel</h2>
+      <p id="panelLabel">Panel 1</p>
+      <label for="panelPhoto">Photo in this panel</label>
+      <select id="panelPhoto"></select>
+      <label for="zoomRange">Zoom</label>
+      <div class="row">
+        <input id="zoomRange" type="range" min="1" max="3" step="0.05" value="1">
+        <output id="zoomValue">100%</output>
+      </div>
+    </section>
+    <section>
+      <h2>5 · Export</h2>
+      <div class="picker" id="sizePicker"></div>
+      <div style="height:10px"></div>
+      <button id="exportBtn" class="primary" type="button">Export PNG</button>
+      <div style="height:8px"></div>
+      <button id="shuffleBtn" class="ghost" type="button">Shuffle layout + grade</button>
+      <p id="exportNote"></p>
+    </section>
+  </aside>
+</main>
+<canvas id="shotCanvas"></canvas>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
