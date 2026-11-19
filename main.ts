@@ -1,13 +1,13 @@
-// Vice City Cover Studio — a make.fun gta6-cover-art-01 entry.
+// Vice City Cover Studio — entry program for gta6-cover-art-01 (Node 22, stdlib only).
 //
-// The program hands the entry in: it copies this repository's app/ and
-// screenshots/ into the output directory and writes dossier.json there,
-// the summary the judge reads, using the vendored make.fun library.
-// Node 22, standard library only, no network, no install step.
+// The app itself is plain static files under app/: index.html opens in desktop
+// Chrome with no network request, and main.js renders the cover maker. This
+// program's only job is to hand that app in: it copies app/ and screenshots/
+// from this repository into the output directory and writes dossier.json with
+// the make.fun library (vendor/makefun-app.ts, the kit's copy, unchanged).
 //
-// Run it locally with:
-//   mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
-// In the grader MAKEFUN_OUTPUT_DIR is unset and /output is used.
+// Local check:  mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
+// The grader runs the same program with /output as the destination.
 
 import { cpSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -17,25 +17,23 @@ import { buildDossier } from './vendor/makefun-app.ts';
 const repoRoot = fileURLToPath(new URL('.', import.meta.url));
 const outputDir = process.env.MAKEFUN_OUTPUT_DIR ?? '/output';
 
-const appSource = join(repoRoot, 'app');
-const shotsSource = join(repoRoot, 'screenshots');
-const appTarget = join(outputDir, 'app');
-const shotsTarget = join(outputDir, 'screenshots');
-
-mkdirSync(outputDir, { recursive: true });
-cpSync(appSource, appTarget, { recursive: true });
-mkdirSync(shotsTarget, { recursive: true });
-if (existsSync(shotsSource)) cpSync(shotsSource, shotsTarget, { recursive: true });
-
-// The scorer's caps for this bounty (its gate.json): only text_max_bytes
-// shapes the dossier bytes; the rest refuse an entry the scorer would
-// refuse — more than 4 screenshots, one over 256 KiB, more than 993
-// files in app/ or 48 MiB of app files, or a path over 1000 bytes.
-const dossier = buildDossier(outputDir, {
+// Caps straight from the competition gate: the dossier text budget, the
+// screenshot count/size limits, and the app/ file count, byte and path caps.
+// Only text_max_bytes changes the dossier bytes; the rest make this program
+// fail exactly where the scorer would refuse the entry.
+const DOSSIER_CAPS = {
   text_max_bytes: 163840,
   screenshots: { max: 4, max_bytes: 262144 },
   app_max_files: 993,
   app_max_bytes: 50331648,
   app_path_max_bytes: 1000,
-});
-writeFileSync(join(outputDir, 'dossier.json'), dossier);
+};
+
+mkdirSync(outputDir, { recursive: true });
+cpSync(join(repoRoot, 'app'), join(outputDir, 'app'), { recursive: true });
+mkdirSync(join(outputDir, 'screenshots'), { recursive: true });
+if (existsSync(join(repoRoot, 'screenshots'))) {
+  cpSync(join(repoRoot, 'screenshots'), join(outputDir, 'screenshots'), { recursive: true });
+}
+
+writeFileSync(join(outputDir, 'dossier.json'), buildDossier(outputDir, DOSSIER_CAPS));
