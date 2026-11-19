@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Vice Cover Studio — GTA 6-style cover art maker</title>
+<link rel="icon" href="data:,">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -17,7 +18,7 @@
     <div class="controls">
       <label class="field">
         <span>Photo</span>
-        <input id="photoInput" type="file" accept="image/*">
+        <input id="photoInput" type="file" accept="image/*" multiple>
       </label>
       <label class="field">
         <span>Caption</span>
@@ -30,21 +31,21 @@
       <label class="field">
         <span>Layout</span>
         <select id="layoutSelect">
-          <option value="poster">Poster</option>
-          <option value="panels">Multi-panel</option>
-          <option value="duo">Duo split</option>
-          <option value="strip">Film strip</option>
-          <option value="hero">Hero portrait</option>
+          <option value="vice-grid">Vice Grid</option>
+          <option value="four-panel">Four Panel</option>
+          <option value="nine-grid">Nine Grid</option>
+          <option value="single-hero">Single Hero</option>
+          <option value="duo-split">Duo Split</option>
         </select>
       </label>
       <label class="field">
         <span>Colour grade</span>
         <select id="gradeSelect">
-          <option value="sunset">Vice sunset</option>
-          <option value="neon">Neon nights</option>
-          <option value="pastel">Pastel dusk</option>
-          <option value="mono">Noir mono</option>
-          <option value="gold">Golden hour</option>
+          <option value="classic">Classic Vice</option>
+          <option value="neon">Neon Nights</option>
+          <option value="sunset" selected>Vice Sunset</option>
+          <option value="noir">Noir</option>
+          <option value="pastel">Pastel Dusk</option>
         </select>
       </label>
       <label class="field">
@@ -56,18 +57,26 @@
         </select>
       </label>
       <button id="exportBtn" type="button">Export PNG</button>
+      <button id="shuffleBtn" type="button" class="btn-secondary">Shuffle</button>
+      <label class="field">
+        <span>Zoom (selected panel)</span>
+        <input id="zoomSlider" type="range" min="1" max="3" step="0.05" value="1">
+      </label>
+      <button id="resetBtn" type="button" class="btn-secondary">Reset panel</button>
     </div>
 
     <div class="preview-wrap">
       <canvas id="coverCanvas" width="1080" height="1080" aria-label="Cover preview"></canvas>
       <p class="preview-note">Live preview — the exported PNG matches this canvas at full size.</p>
+      <div id="thumbnails" class="thumbnails" aria-label="Photo thumbnails"></div>
     </div>
   </section>
 
   <aside class="help" aria-label="How it works">
     <h2>How it works</h2>
     <ol>
-      <li>Load a photo from your machine — it never leaves your browser.</li>
+      <li>Load one or more photos from your machine — they never leave your browser, and are dealt round-robin across the panels.</li>
+      <li>Click a panel to select it, drag to pan, scroll to zoom, double-click to reset it. Click a thumbnail to put that photo in the selected panel.</li>
       <li>Edit the caption and subtitle, pick a layout and a colour grade.</li>
       <li>Export a PNG in square, portrait, or landscape size and share it.</li>
     </ol>
@@ -75,6 +84,7 @@
   </aside>
 </main>
 
+<script src="src/cover.js"></script>
 <script src="src/main.js"></script>
 </body>
 </html>
