@@ -4,15 +4,13 @@
 [![rank](https://make.fun/badge/gta6-cover-art-01/Alhazard29/gta6-cover-art-01/rank.svg)](https://make.fun/bounty/gta6-cover-art-01/leaderboard?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 [![reward](https://make.fun/badge/gta6-cover-art-01/Alhazard29/gta6-cover-art-01/reward.svg)](https://make.fun/bounty/gta6-cover-art-01?utm_source=github&utm_medium=readme&utm_campaign=gta6-cover-art-01)
 
-Vice Cover Studio — a GTA 6-style cover art maker that runs entirely offline in your browser. Drop in your own photo, write a caption, pick a multi-panel layout and a Vice City sunset or neon colour grade, and export a share-ready PNG in 1080 × 1080, 1080 × 1350 or 1920 × 1080. No uploads, no network requests, no font files: all lettering uses system fonts only, and your photos never leave your machine. An original design — no Rockstar Games logo, artwork, or font.
+Vice City Cover Studio is an offline photo-to-poster cover maker: drop in your own photos, arrange them across five multi-panel poster layouts, pick a Vice City sunset or neon colour grade, write a bold caption, and export a share-ready PNG in 1080×1080, 1080×1350, or 1920×1080 — everything runs locally in the browser, your photos never leave your machine, and all lettering uses system fonts with original artwork only.
 
 ## Run it
 
 ```sh
-python3 -m http.server --directory app 8080
+mkdir -p out && MAKEFUN_OUTPUT_DIR=out node main.ts
 ```
-
-Then open http://localhost:8080 in desktop Chrome, load a photo, edit the caption, and export your cover as PNG.
 
 ---
 

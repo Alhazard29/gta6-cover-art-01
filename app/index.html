@@ -3,88 +3,89 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vice Cover Studio — GTA 6-style cover art maker</title>
-<link rel="icon" href="data:,">
+<title>Vice City Cover Studio</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%23ff6b5e'/%3E%3Ctext x='32' y='44' font-size='28' font-family='Arial' font-weight='bold' text-anchor='middle' fill='%230f2027'%3EVC%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header class="topbar">
-  <h1 class="app-title">VICE <span>COVER</span> STUDIO</h1>
-  <p class="app-tagline">Turn your photo into GTA 6-style poster art — offline, in your browser.</p>
+<header class="masthead">
+  <h1>Vice City Cover Studio</h1>
+  <p class="tagline">Your photos. Five panels. One sunset. A poster worth posting.</p>
 </header>
 
-<main class="layout">
-  <section class="editor" aria-label="Cover editor">
-    <div class="controls">
-      <label class="field">
-        <span>Photo</span>
-        <input id="photoInput" type="file" accept="image/*" multiple>
-      </label>
-      <label class="field">
-        <span>Caption</span>
-        <input id="captionInput" type="text" value="VICE CITY" maxlength="40" autocomplete="off">
-      </label>
-      <label class="field">
-        <span>Subtitle</span>
-        <input id="subtitleInput" type="text" value="Streets of Leonida" maxlength="60" autocomplete="off">
-      </label>
-      <label class="field">
-        <span>Layout</span>
-        <select id="layoutSelect">
-          <option value="vice-grid">Vice Grid</option>
-          <option value="four-panel">Four Panel</option>
-          <option value="nine-grid">Nine Grid</option>
-          <option value="single-hero">Single Hero</option>
-          <option value="duo-split">Duo Split</option>
-        </select>
-      </label>
-      <label class="field">
-        <span>Colour grade</span>
-        <select id="gradeSelect">
-          <option value="classic">Classic Vice</option>
-          <option value="neon">Neon Nights</option>
-          <option value="sunset" selected>Vice Sunset</option>
-          <option value="noir">Noir</option>
-          <option value="pastel">Pastel Dusk</option>
-        </select>
-      </label>
-      <label class="field">
-        <span>Export size</span>
-        <select id="sizeSelect">
-          <option value="1080x1080">1080 × 1080 (square)</option>
-          <option value="1080x1350">1080 × 1350 (portrait)</option>
-          <option value="1920x1080">1920 × 1080 (landscape)</option>
-        </select>
-      </label>
-      <button id="exportBtn" type="button">Export PNG</button>
-      <button id="shuffleBtn" type="button" class="btn-secondary">Shuffle</button>
-      <label class="field">
-        <span>Zoom (selected panel)</span>
-        <input id="zoomSlider" type="range" min="1" max="3" step="0.05" value="1">
-      </label>
-      <button id="resetBtn" type="button" class="btn-secondary">Reset panel</button>
-    </div>
-
-    <div class="preview-wrap">
-      <canvas id="coverCanvas" width="1080" height="1080" aria-label="Cover preview"></canvas>
-      <p class="preview-note">Live preview — the exported PNG matches this canvas at full size.</p>
-      <div id="thumbnails" class="thumbnails" aria-label="Photo thumbnails"></div>
-    </div>
+<main class="studio">
+  <section class="preview-pane" aria-label="Cover preview">
+    <canvas id="coverCanvas" width="1080" height="1080"></canvas>
+    <p id="panelHint" class="panel-hint">Selected panel: 1 — click a panel on the canvas to select it.</p>
+    <p id="statusLine" class="status" role="status">Load a photo to begin.</p>
   </section>
 
-  <aside class="help" aria-label="How it works">
-    <h2>How it works</h2>
-    <ol>
-      <li>Load one or more photos from your machine — they never leave your browser, and are dealt round-robin across the panels.</li>
-      <li>Click a panel to select it, drag to pan, scroll to zoom, double-click to reset it. Click a thumbnail to put that photo in the selected panel.</li>
-      <li>Edit the caption and subtitle, pick a layout and a colour grade.</li>
-      <li>Export a PNG in square, portrait, or landscape size and share it.</li>
-    </ol>
-    <p class="fineprint">An original design. No Rockstar Games logo, artwork, or font. All lettering uses system fonts — the app ships zero font files and makes zero network requests.</p>
-  </aside>
+  <section class="controls" aria-label="Cover controls">
+    <div class="control-group">
+      <h2>Photos</h2>
+      <label class="upload-label" for="photoInput">Add photos</label>
+      <input id="photoInput" type="file" accept="image/*" multiple>
+      <p class="note">Photos are read on your machine and never uploaded.</p>
+      <ul id="photoList" class="photo-list"></ul>
+    </div>
+
+    <div class="control-group">
+      <h2>Layout</h2>
+      <div class="picker" id="layoutPicker">
+        <button type="button" data-layout="vice-grid" class="active">Vice Grid</button>
+        <button type="button" data-layout="four-panel">Four Panel</button>
+        <button type="button" data-layout="nine-grid">Nine Grid</button>
+        <button type="button" data-layout="full-bleed">Full Bleed</button>
+        <button type="button" data-layout="triple-strip">Triple Strip</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h2>Colour grade</h2>
+      <div class="picker" id="gradePicker">
+        <button type="button" data-grade="vice-sunset" class="active">Vice Sunset</button>
+        <button type="button" data-grade="neon-nights">Neon Nights</button>
+        <button type="button" data-grade="palm-dusk">Palm Dusk</button>
+        <button type="button" data-grade="noir">Noir</button>
+        <button type="button" data-grade="candy-pop">Candy Pop</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h2>Caption</h2>
+      <label for="titleInput">Title</label>
+      <input id="titleInput" type="text" value="VICE CITY" maxlength="48" autocomplete="off">
+      <label for="subtitleInput">Subtitle</label>
+      <input id="subtitleInput" type="text" value="a story in every panel" maxlength="80" autocomplete="off">
+    </div>
+
+    <div class="control-group">
+      <h2>Export size</h2>
+      <div class="picker" id="sizePicker">
+        <button type="button" data-size="1080x1080" class="active">1080×1080</button>
+        <button type="button" data-size="1080x1350">1080×1350</button>
+        <button type="button" data-size="1920x1080">1920×1080</button>
+      </div>
+    </div>
+
+    <div class="control-group">
+      <h2>Selected panel</h2>
+      <label for="zoomSlider">Zoom</label>
+      <input id="zoomSlider" type="range" min="50" max="200" value="100" step="5">
+      <button type="button" id="resetPanelBtn">Reset panel</button>
+    </div>
+
+    <div class="actions">
+      <button type="button" id="shuffleBtn">Shuffle</button>
+      <button type="button" id="exportBtn" class="primary">Export PNG</button>
+    </div>
+  </section>
 </main>
 
-<script src="src/cover.js"></script>
-<script src="src/main.js"></script>
+<footer class="footnote">
+  <p>All art and lettering is original. Photos stay on your device.</p>
+</footer>
+
+<script type="module" src="src/main.js"></script>
 </body>
 </html>
