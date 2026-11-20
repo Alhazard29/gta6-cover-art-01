@@ -84,7 +84,11 @@ body {
   border: 2px solid var(--panel-line);
   border-radius: 6px;
   box-shadow: 0 14px 40px rgba(0, 0, 0, 0.55);
+  cursor: grab;
+  touch-action: none;
 }
+
+#coverCanvas:active { cursor: grabbing; }
 
 .panel-hint {
   margin: 12px 0 0;
@@ -144,6 +148,31 @@ body {
   border-bottom: 1px dashed var(--panel-line);
   overflow-wrap: anywhere;
 }
+
+/* Clickable photo thumbnails: tap one to drop it into the selected panel. */
+.photo-list li.photo-thumb {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+  padding: 6px 4px;
+  border-radius: 6px;
+}
+
+.photo-list li.photo-thumb:hover { background: var(--bg-deep); }
+
+.photo-list li.photo-thumb img {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 2px solid var(--panel-line);
+  flex-shrink: 0;
+}
+
+.photo-list li.photo-thumb.chosen img { border-color: var(--teal); }
+
+.photo-list li.photo-thumb span { font-size: 0.88rem; }
 
 .picker {
   display: flex;
