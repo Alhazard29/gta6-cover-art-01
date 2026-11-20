@@ -211,18 +211,21 @@ function setLayout(layout) {
   state.layout = layout;
   state.selectedPanel = 0;
   ensurePanels();
+  markActive('layoutPicker', 'layout', state.layout);
   renderPreview();
 }
 
 function setGrade(grade) {
   if (!GRADES.includes(grade)) return;
   state.grade = grade;
+  markActive('gradePicker', 'grade', state.grade);
   renderPreview();
 }
 
 function setSize(size) {
   if (!SIZES.includes(size)) return;
   state.size = size;
+  markActive('sizePicker', 'size', state.size);
   renderPreview();
 }
 
